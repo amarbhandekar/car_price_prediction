@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Prediction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Car Price Prediction</h1>
+        <form id="car-form">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="year" class="form-label">Year</label>
+                        <select id="year" name="Year" class="form-select"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="fuel_type" class="form-label">Fuel Type</label>
+                        <select id="fuel_type" name="Fuel_Type" class="form-select"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="seller_type" class="form-label">Seller Type</label>
+                        <select id="seller_type" name="Seller_Type" class="form-select"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="transmission" class="form-label">Transmission</label>
+                        <select id="transmission" name="Transmission" class="form-select"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="present_price" class="form-label">Present Price</label>
+                        <input type="number" id="present_price" name="Present_Price" class="form-control" step="any" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="kms_driven" class="form-label">Kms Driven</label>
+                        <input type="number" id="kms_driven" name="Kms_Driven" class="form-control" step="any" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="owner" class="form-label">Owner</label>
+                        <input type="number" id="owner" name="Owner" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Predict Price</button>
+        </form>
+        <h3 class="mt-4">Predicted Price: <span id="predicted_price">     </span></h3>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Load year options
+            $.getJSON('/year_options', function(data) {
+                $('#year').append(data.map(function(year) {
+                    return `<option value="${year}">${year}</option>`;
+                }));
+            });
+
+            // Load fuel type options
+            $.getJSON('/fuel_options', function(data) {
+                $('#fuel_type').append(data.map(function(fuelType) {
+                    return `<option value="${fuelType}">${fuelType}</option>`;
+                }));
+            });
+
+            // Load seller type options
+            $.getJSON('/seller_options', function(data) {
+                $('#seller_type').append(data.map(function(sellerType) {
+                    return `<option value="${sellerType}">${sellerType}</option>`;
+                }));
+            });
+
+            // Load transmission options
+            $.getJSON('/transmission_options', function(data) {
+                $('#transmission').append(data.map(function(transmission) {
+                    return `<option value="${transmission}">${transmission}</option>`;
+                }));
+            });
+
+            // Handle form submission
+            $('#car-form').on('submit', function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/prediction',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#predicted_price').text(response['Predicted Car Price']);
+                    },
+                    error: function() {
+                        $('#predicted_price').text('Error predicting price');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
